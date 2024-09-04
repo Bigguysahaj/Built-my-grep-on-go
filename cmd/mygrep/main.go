@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"unicode/utf8"
+	"regexp"
 )
 
 // bytes: Provides functions for byte slice manipulation, like checking for character presence.
@@ -52,18 +52,18 @@ func main() {
 func matchLine(line []byte, pattern string) (bool, error) {
 
 	// Checks if the character is more than one character long, characters of 1 length not supported.
-	if utf8.RuneCountInString(pattern) != 1 {
-		return false, fmt.Errorf("unsupported pattern: %q", pattern)
+	// if utf8.RuneCountInString(pattern) != 1 {
+	// 	return false, fmt.Errorf("unsupported pattern: %q", pattern)
+	// }
+
+	var regPattern = regexp.MustCompile(pattern)
+	ok := regPattern.Match(line)
+	
+	if ok {
+		fmt.Println("Your word ", string(line), "contains the pattern", pattern)
+	} else {
+		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
 	}
-
-	var ok bool
-
-	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
-
-	// Checks if any character in pattern exists in line.
-	// Apparently very easy execution due to go libraries.
-	ok = bytes.ContainsAny(line, pattern)
 
 	return ok, nil
 }

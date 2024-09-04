@@ -36,3 +36,9 @@ Note: This section is for stages 2 and beyond.
    `cmd/mygrep/main.go`.
 1. Commit your changes and run `git push origin master` to submit your solution
    to CodeCrafters. Test output will be streamed to your terminal.
+
+# First stage :
+
+a should match "apple", but not "dog".
+
+echo "apple" | ./mygrep.exe -E "a"
