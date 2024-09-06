@@ -126,7 +126,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 						i += closeBracket
 					} else if pattern[i] == '+' {
 						hasPlus = true
-						if (line[lineIndex] == pattern[i-1]){
+						for (line[lineIndex] == pattern[i-1]){
 							lineIndex++
 						}
 					} else {
@@ -139,7 +139,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 					}
 			}
 			
-			if !ok && (hasCircumflex || hasDollar || hasPlus) {
+			if !ok && (hasCircumflex || hasDollar || hasPlus ) {
 				break 
 			}
 
