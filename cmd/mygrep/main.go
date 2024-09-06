@@ -91,12 +91,16 @@ func matchLine(line []byte, pattern string) (bool, error) {
 							return false, fmt.Errorf("unclosed character class")
 						}
 						positiveCharacters := pattern[i+1 : i+closeBracket]
-						if !bytes.ContainsAny([]byte{line[lineIndex]}, positiveCharacters) {
+						if !bytes.ContainsAny(line, positiveCharacters) {
 							ok = false
-							if bytes.ContainsAny([]byte(positiveCharacters), "^") {
-								ok = !ok
-							}
-							break
+						}
+						if bytes.ContainsAny([]byte(positiveCharacters), "^") {
+							ok = !ok
+						}
+
+						if !ok {
+							fmt.Println("Lost to brackets")
+							return false, nil
 						}
 						i += closeBracket
 					} else {
