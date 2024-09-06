@@ -77,7 +77,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// 		}
 	// 	}
 	// } else {
-		// 	fmt.Println("else" , ok)
+		// 	fmt.Println("else", ok)
 		// }
 		
 	var regPattern = regexp.MustCompile(pattern)
