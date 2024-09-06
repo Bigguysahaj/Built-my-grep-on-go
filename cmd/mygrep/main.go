@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"regexp"
+	"strings"
 )
 
 // bytes: Provides functions for byte slice manipulation, like checking for character presence.
@@ -56,38 +56,59 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// 	return false, fmt.Errorf("unsupported pattern: %q", pattern)
 	// }
 
-	var ok bool = false
+	// var ok bool = false
 	// var ok bool 
 
-	if (bytes.Contains([]byte(pattern), []byte{'['})){
-		for _, runeValue := range pattern {
-			if runeValue == '[' || runeValue == ']' {
-				continue
-			}
+	// if (bytes.Contains([]byte(pattern), []byte{'['})){
+	// 	for _, runeValue := range pattern {
+	// 		if runeValue == '[' || runeValue == ']' {
+	// 			continue
+	// 		}
 
-			var regPattern = regexp.MustCompile(string(runeValue))
-			ok := regPattern.Match(line)
+	// 		var regPattern = regexp.MustCompile(string(runeValue))
+	// 		ok := regPattern.Match(line)
 
-			if ok {
-				// flag = !flag
-				fmt.Println("Your word ", string(line), "contains the pattern", pattern)
-				os.Exit(0)
-				break
-			}
-		}
-	} else {
-		var regPattern = regexp.MustCompile(pattern)
-		ok := regPattern.Match(line)
-		fmt.Println("else" , ok)
+	// 		if ok {
+	// 			// flag = !flag
+	// 			fmt.Println("Your word ", string(line), "contains the pattern", pattern)
+	// 			os.Exit(0)
+	// 			break
+	// 		}
+	// 	}
+	// } else {
+		// 	fmt.Println("else" , ok)
+		// }
+		
+	// var regPattern = regexp.MustCompile(pattern)
+	// ok := regPattern.Match(line)
+
+	var ok bool
+
+	ok = bytes.ContainsAny(line, pattern)
+
+	if strings.Contains(pattern, "\\d") {
+
+		ok = bytes.ContainsAny(line, "0123456789")
+
+	} else if strings.Contains(pattern, "\\w") {
+
+		ok = bytes.ContainsAny(line, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+
+	} else if strings.HasPrefix(pattern, "[") {
+
+		positiveChars := strings.TrimSuffix(strings.TrimPrefix(pattern, "["), "]")
+
+		ok = bytes.ContainsAny(line, positiveChars)
+
 	}
-	
-	
-	fmt.Println("again", ok)
-	if ok{
-		fmt.Println("Your word ", string(line), "contains the pattern", pattern)
-	} else {
-		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
-	}
+
+
+	// fmt.Println("again", ok)
+	// if ok{
+	// 	fmt.Println("Your word ", string(line), "contains the pattern", pattern)
+	// } else {
+	// 	fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
+	// }
 
 	return ok, nil
 }
