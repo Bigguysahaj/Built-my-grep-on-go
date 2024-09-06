@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -66,10 +65,20 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		
 		ok = bytes.ContainsAny(line, positiveChars)
 		
-	} else {		
-		var regPattern = regexp.MustCompile(pattern)
-		ok = regPattern.Match(line)
+	} else if strings.Contains(pattern, "\\d") {
+
+		ok = bytes.ContainsAny(line, "0123456789")
+
+	} else if strings.Contains(pattern, "\\w") {
+
+		ok = bytes.ContainsAny(line, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
 	}
-	
+	// else {		
+
+	// 	// var regPattern = regexp.MustCompile(pattern)
+	// 	// ok = regPattern.Match(line)
+
+	// }
+
 	return ok, nil
 }
