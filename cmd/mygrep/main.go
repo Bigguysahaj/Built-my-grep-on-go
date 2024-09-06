@@ -76,6 +76,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 			for ; i < len(pattern); i++ {
 					if lineIndex >= len(line) {
 						fmt.Println("segmentation fault inner loop")
+						if 
 						ok = false
 						break
 					}
@@ -142,10 +143,16 @@ func matchLine(line []byte, pattern string) (bool, error) {
 							// condition for '?'
 							if pattern[i] == '?' {
 								lineIndex--
-							} else if !(i+1 < len(pattern) && pattern[i+1] == '?') {
-								fmt.Printf("Basic mismatch error %c, %c \n", line[lineIndex], pattern[i])
-								ok = false
-								break
+							} else {
+								if (i+1 < len(pattern) && pattern[i+1] == '?') {
+									i += 2
+									ok = pattern[i] == line[lineIndex]
+								} else{
+									fmt.Printf("Basic mismatch error %c, %c \n", line[lineIndex], pattern[i])
+									ok = false
+									break
+								}
+							
 							}
 						} 
 						lineIndex++
