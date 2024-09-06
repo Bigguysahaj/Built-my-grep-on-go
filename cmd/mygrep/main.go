@@ -75,8 +75,10 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	
 	if flag {
 		fmt.Println("Your word ", string(line), "contains the pattern", pattern)
+		os.Exit(0)
 	} else {
 		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
+		os.Exit(1)
 	}
 
 	return flag, nil
