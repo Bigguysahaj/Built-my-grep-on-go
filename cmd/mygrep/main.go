@@ -58,26 +58,18 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// }
 		
 	var ok bool 
-		ok = bytes.ContainsAny(line, pattern)
+	ok = bytes.ContainsAny(line, pattern)
+	
+	if strings.HasPrefix(pattern, "[") {
 		
-		if strings.HasPrefix(pattern, "[") {
-			
-			positiveChars := strings.TrimSuffix(strings.TrimPrefix(pattern, "["), "]")
-			
-			ok = bytes.ContainsAny(line, positiveChars)
-			
-		} else {		
-			var regPattern = regexp.MustCompile(pattern)
-			ok = regPattern.Match(line)
-		}
-
-
-	fmt.Println("again", ok)
-	if ok{
-		fmt.Println("Your word ", string(line), "contains the pattern", pattern)
-	} else {
-		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
+		positiveChars := strings.TrimSuffix(strings.TrimPrefix(pattern, "["), "]")
+		
+		ok = bytes.ContainsAny(line, positiveChars)
+		
+	} else {		
+		var regPattern = regexp.MustCompile(pattern)
+		ok = regPattern.Match(line)
 	}
-
+	
 	return ok, nil
 }
