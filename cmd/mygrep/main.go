@@ -51,6 +51,7 @@ func main() {
 func matchLine(line []byte, pattern string) (bool, error) {
 	hasCircumflex := pattern[0] == '^'
 	hasPlus := false
+	lineIndex := 0 
 	hasDollar := strings.HasSuffix(pattern,"$")
 	i := 0
 	if (hasCircumflex || hasDollar) {
@@ -63,14 +64,19 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		fmt.Println("lines and patterns", line, pattern)
 	}
 	for startIndex := 0; startIndex < len(line); startIndex++ {
-			ok := true
-			lineIndex := startIndex
+		if lineIndex >= len(line) {
+			fmt.Println("segmentation fault outer loop")
+			
+			break
+		}
+		ok := true
+		lineIndex = startIndex
+		
 
 			for ; i < len(pattern); i++ {
 					if lineIndex >= len(line) {
-							fmt.Println("segmentation fault")
-							ok = false
-							break
+						fmt.Println("segmentation fault inner loop")
+						break
 					}
 					
 					if pattern[i] == '\\' && i+1 < len(pattern) {
@@ -130,10 +136,14 @@ func matchLine(line []byte, pattern string) (bool, error) {
 							lineIndex++
 						}
 					} else {
+						fmt.Printf("Let's see all %c, %c \n", line[lineIndex], pattern[i])
 						if line[lineIndex] != pattern[i] {
-							fmt.Printf("Basic mismatch error %c, %c \n", line[lineIndex], pattern[i])
-							ok = false
-							break
+							// condition for '?'
+							if !(i+1 < len(pattern) && pattern[i+1] == '?') {
+								fmt.Printf("Basic mismatch error %c, %c \n", line[lineIndex], pattern[i])
+								ok = false
+								break
+							}
 						} 
 						lineIndex++
 					}
