@@ -57,7 +57,8 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// 	return false, fmt.Errorf("unsupported pattern: %q", pattern)
 	// }
 		
-		ok := bytes.ContainsAny(line, pattern)
+	var ok bool 
+		ok = bytes.ContainsAny(line, pattern)
 		
 		if strings.HasPrefix(pattern, "[") {
 			
