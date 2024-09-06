@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -79,7 +80,8 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		// 	fmt.Println("else" , ok)
 		// }
 		
-	// var regPattern = regexp.MustCompile(pattern)
+	var regPattern = regexp.MustCompile(pattern)
+	fmt.Println(regPattern)
 	// ok := regPattern.Match(line)
 
 	var ok bool
