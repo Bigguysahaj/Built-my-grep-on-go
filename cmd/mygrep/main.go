@@ -48,11 +48,18 @@ func main() {
 
 // mastermind function
 func matchLine(line []byte, pattern string) (bool, error) {
+	hasCircumflex := pattern[0] == '^'
+	i := 0
+	if (hasCircumflex) {
+		i = 1
+	}
 	for startIndex := 0; startIndex < len(line); startIndex++ {
 			ok := true
 			lineIndex := startIndex
-			for i := 0; i < len(pattern); i++ {
+
+			for ; i < len(pattern); i++ {
 					if lineIndex >= len(line) {
+							fmt.Println("segmentation fault")
 							ok = false
 							break
 					}
@@ -60,6 +67,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 					if pattern[i] == '\\' && i+1 < len(pattern) {
 							if pattern[i+1] == 'd' {
 									if !bytes.ContainsAny([]byte{line[lineIndex]}, "0123456789") {
+											fmt.Println("Error on \\d")
 											ok = false
 											break
 									}
@@ -67,20 +75,23 @@ func matchLine(line []byte, pattern string) (bool, error) {
 									lineIndex++
 							} else if pattern[i+1] == 'w' {
 									if !bytes.ContainsAny([]byte{line[lineIndex]}, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_") {
-											ok = false
-											break
+										fmt.Println("Error on \\w")	
+										ok = false
+										break
 									}
 									i++
 									lineIndex++
 							} else {
 									if line[lineIndex] != '\\' {
-											ok = false
-											break
+
+										ok = false
+										break
 									}
 									lineIndex++
 							}
 					} else if pattern[i] == ' ' {
 							if line[lineIndex] != ' ' {
+								fmt.Println("Error on space")
 									ok = false
 									break
 							}
@@ -92,6 +103,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 						}
 						positiveCharacters := pattern[i+1 : i+closeBracket]
 						if !bytes.ContainsAny(line, positiveCharacters) {
+							fmt.Println("No positive character error")
 							ok = false
 						}
 						if bytes.ContainsAny([]byte(positiveCharacters), "^") {
@@ -104,14 +116,19 @@ func matchLine(line []byte, pattern string) (bool, error) {
 						}
 						i += closeBracket
 					} else {
-							if line[lineIndex] != pattern[i] {
-									ok = false
-									break
-							}
-							lineIndex++
+						if line[lineIndex] != pattern[i] {
+							fmt.Printf("Basic mismatch error %c, %c \n", line[lineIndex], pattern[i])
+							ok = false
+							break
+						}
+						lineIndex++
 					}
 			}
 			
+			if !ok && hasCircumflex {
+				break 
+			}
+
 			if ok {
 				fmt.Println("Your word ", string(line), "contains the pattern", pattern)
 				return true, nil
