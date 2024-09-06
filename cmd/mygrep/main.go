@@ -67,7 +67,9 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		var regPattern = regexp.MustCompile(string(runeValue))
 		ok := regPattern.Match(line)
 
-		if !ok {
+		fmt.Println(ok)
+
+		if ok {
 			flag = !flag
 			break
 		}
