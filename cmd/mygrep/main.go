@@ -57,8 +57,8 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// }
 
 	var flag = false
-	var ok bool 
-	
+	// var ok bool 
+
 	for v := range pattern {
 		if v == '[' || v == ']' {
 			continue
@@ -79,5 +79,5 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
 	}
 
-	return ok, nil
+	return flag, nil
 }
