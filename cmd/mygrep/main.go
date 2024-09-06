@@ -45,7 +45,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// default exit code is 0 which means success
 }
 
 // mastermind function
@@ -73,12 +72,13 @@ func matchLine(line []byte, pattern string) (bool, error) {
 
 		ok = bytes.ContainsAny(line, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
 	}
-	// else {		
 
-	// 	// var regPattern = regexp.MustCompile(pattern)
-	// 	// ok = regPattern.Match(line)
-
-	// }
+	
+	if ok {
+		fmt.Println("Your word ", string(line), "contains the pattern", pattern)
+	} else {
+		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)		
+	}
 
 	return ok, nil
 }
