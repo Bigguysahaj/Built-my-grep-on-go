@@ -139,7 +139,9 @@ func matchLine(line []byte, pattern string) (bool, error) {
 						fmt.Printf("Let's see all %c, %c \n", line[lineIndex], pattern[i])
 						if line[lineIndex] != pattern[i] {
 							// condition for '?'
-							if !(i+1 < len(pattern) && pattern[i+1] == '?') {
+							if pattern[i] == '?' {
+								lineIndex--
+							} else if !(i+1 < len(pattern) && pattern[i+1] == '?') {
 								fmt.Printf("Basic mismatch error %c, %c \n", line[lineIndex], pattern[i])
 								ok = false
 								break
