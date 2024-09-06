@@ -56,8 +56,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// 	return false, fmt.Errorf("unsupported pattern: %q", pattern)
 	// }
 
-	var flag bool = false
-	// var ok bool 
+	var ok bool 
 
 	for v := range pattern {
 		if v == '[' || v == ']' {
@@ -67,19 +66,18 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		ok := regPattern.Match(line)
 
 		if ok {
-			flag = !flag
 			break
 		}
 	}
 
 	
-	if flag {
+	if ok{
 		fmt.Println("Your word ", string(line), "contains the pattern", pattern)
-		os.Exit(0)
+		// os.Exit(0)
 	} else {
 		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
-		os.Exit(1)
+		// os.Exit(1)
 	}
 
-	return flag, nil
+	return ok, nil
 }
