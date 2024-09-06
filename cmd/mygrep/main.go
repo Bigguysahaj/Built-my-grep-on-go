@@ -50,6 +50,7 @@ func main() {
 // mastermind function
 func matchLine(line []byte, pattern string) (bool, error) {
 	hasCircumflex := pattern[0] == '^'
+	hasPlus := false
 	hasDollar := strings.HasSuffix(pattern,"$")
 	i := 0
 	if (hasCircumflex || hasDollar) {
@@ -123,17 +124,22 @@ func matchLine(line []byte, pattern string) (bool, error) {
 							return false, nil
 						}
 						i += closeBracket
+					} else if pattern[i] == '+' {
+						hasPlus = true
+						if (line[lineIndex] == pattern[i-1]){
+							lineIndex++
+						}
 					} else {
 						if line[lineIndex] != pattern[i] {
 							fmt.Printf("Basic mismatch error %c, %c \n", line[lineIndex], pattern[i])
 							ok = false
 							break
-						}
+						} 
 						lineIndex++
 					}
 			}
 			
-			if !ok && (hasCircumflex || hasDollar) {
+			if !ok && (hasCircumflex || hasDollar || hasPlus) {
 				break 
 			}
 
