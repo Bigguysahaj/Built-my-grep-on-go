@@ -85,6 +85,20 @@ func matchLine(line []byte, pattern string) (bool, error) {
 									break
 							}
 							lineIndex++
+					} else if pattern[i] == '[' {
+						closeBracket := bytes.IndexByte([]byte(pattern[i:]), ']')
+						if closeBracket == -1 {
+							return false, fmt.Errorf("unclosed character class")
+						}
+						positiveCharacters := pattern[i+1 : i+closeBracket]
+						if !bytes.ContainsAny([]byte{line[lineIndex]}, positiveCharacters) {
+							ok = false
+							if bytes.ContainsAny([]byte(positiveCharacters), "^") {
+								ok = !ok
+							}
+							break
+						}
+						i += closeBracket
 					} else {
 							if line[lineIndex] != pattern[i] {
 									ok = false
@@ -98,7 +112,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 				fmt.Println("Your word ", string(line), "contains the pattern", pattern)
 				return true, nil
 			}
-}
+		}
 
 	fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)		
 	return false, nil
