@@ -58,11 +58,14 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	var ok bool 
 	ok = bytes.ContainsAny(line, pattern)
 	
-	if strings.HasPrefix(pattern, "[") {
+	if strings.HasPrefix(pattern, "[") && strings.HasPrefix(pattern, "}") {
 		
 		positiveChars := strings.TrimSuffix(strings.TrimPrefix(pattern, "["), "]")
 		
 		ok = bytes.ContainsAny(line, positiveChars)
+		if strings.HasPrefix(positiveChars, "^0") {
+			ok = !ok
+		}
 		
 	} else if strings.Contains(pattern, "\\d") {
 
