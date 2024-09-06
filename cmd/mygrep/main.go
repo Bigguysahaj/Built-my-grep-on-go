@@ -76,7 +76,6 @@ func matchLine(line []byte, pattern string) (bool, error) {
 			for ; i < len(pattern); i++ {
 					if lineIndex >= len(line) {
 						fmt.Println("segmentation fault inner loop")
-						if 
 						ok = false
 						break
 					}
