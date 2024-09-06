@@ -59,20 +59,27 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	var flag bool = false
 	// var ok bool 
 
-	for _, runeValue := range pattern {
-		if runeValue == '[' || runeValue == ']' {
-			continue
-		}
+	if (bytes.Contains([]byte(pattern), []byte{'['})){
+		for _, runeValue := range pattern {
+			if runeValue == '[' || runeValue == ']' {
+				continue
+			}
 
-		var regPattern = regexp.MustCompile(string(runeValue))
+			var regPattern = regexp.MustCompile(string(runeValue))
+			ok := regPattern.Match(line)
+
+			fmt.Println(ok)
+
+			if ok {
+				flag = !flag
+				break
+			}
+		}
+	} else {
+		var regPattern = regexp.MustCompile(pattern)
 		ok := regPattern.Match(line)
 
-		fmt.Println(ok)
-
-		if ok {
-			flag = !flag
-			break
-		}
+		flag = ok
 	}
 
 	
