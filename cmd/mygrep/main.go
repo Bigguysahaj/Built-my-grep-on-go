@@ -136,6 +136,9 @@ func matchLine(line []byte, pattern string) (bool, error) {
 						for (line[lineIndex] == pattern[i-1]){
 							lineIndex++
 						}
+					} else if pattern[i] == '.'{
+						i++
+						lineIndex++
 					} else {
 						fmt.Printf("Let's see all %c, %c \n", line[lineIndex], pattern[i])
 						if line[lineIndex] != pattern[i] {
