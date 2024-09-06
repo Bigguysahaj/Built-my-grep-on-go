@@ -56,7 +56,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 	// 	return false, fmt.Errorf("unsupported pattern: %q", pattern)
 	// }
 
-	var flag = false
+	var flag bool = false
 	// var ok bool 
 
 	for v := range pattern {
@@ -79,5 +79,5 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)
 	}
 
-	return !flag, nil
+	return flag, nil
 }
