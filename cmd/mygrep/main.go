@@ -137,8 +137,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 							lineIndex++
 						}
 					} else if pattern[i] == '.'{
-						i++
-						lineIndex++
+						fmt.Println("We are doing nothing")
 					} else {
 						fmt.Printf("Let's see all %c, %c \n", line[lineIndex], pattern[i])
 						if line[lineIndex] != pattern[i] {
