@@ -68,20 +68,21 @@ func matchLine(line []byte, pattern string) (bool, error) {
 			var regPattern = regexp.MustCompile(string(runeValue))
 			ok := regPattern.Match(line)
 
-			fmt.Println(ok)
-
 			if ok {
 				// flag = !flag
+				fmt.Println("Your word ", string(line), "contains the pattern", pattern)
+				os.Exit(0)
 				break
 			}
 		}
 	} else {
 		var regPattern = regexp.MustCompile(pattern)
 		ok := regPattern.Match(line)
-		fmt.Println(ok)
+		fmt.Println("else" , ok)
 	}
-
 	
+	
+	fmt.Println("again", ok)
 	if ok{
 		fmt.Println("Your word ", string(line), "contains the pattern", pattern)
 	} else {
