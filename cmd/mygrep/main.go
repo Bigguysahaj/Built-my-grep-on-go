@@ -48,47 +48,58 @@ func main() {
 
 // mastermind function
 func matchLine(line []byte, pattern string) (bool, error) {
-
-	for startIndex :=0 ; startIndex < len(line) ; startIndex++ {
-		ok := true
-		lineIndex := startIndex
-
-		for i:=0 ; i < len(pattern) ; i++ {
-			if lineIndex >= len(line) {
-				ok = false
-			}
-
-			if pattern[i] == '\\' && i+1 < len(pattern) {
-				if (pattern[i+1] == 'd') {
-					if !bytes.ContainsAny([]byte{line[lineIndex]}, "0123456789"){
-						ok = false
-						break
-					}
-					i++
-				} else if (pattern[i+1] == 'd') {
-					if !bytes.ContainsAny([]byte{line[lineIndex]},  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_") {
-						ok = false
-						break
-					}
-					i++
-				} else {
-					// Handle literal backslash
-					if line[lineIndex] != '\\' {
+	for startIndex := 0; startIndex < len(line); startIndex++ {
+			ok := true
+			lineIndex := startIndex
+			for i := 0; i < len(pattern); i++ {
+					if lineIndex >= len(line) {
 							ok = false
 							break
 					}
-				}
-			} else if pattern[i] != line[lineIndex] {
-				ok = false
-				break
+					
+					if pattern[i] == '\\' && i+1 < len(pattern) {
+							if pattern[i+1] == 'd' {
+									if !bytes.ContainsAny([]byte{line[lineIndex]}, "0123456789") {
+											ok = false
+											break
+									}
+									i++
+									lineIndex++
+							} else if pattern[i+1] == 'w' {
+									if !bytes.ContainsAny([]byte{line[lineIndex]}, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_") {
+											ok = false
+											break
+									}
+									i++
+									lineIndex++
+							} else {
+									if line[lineIndex] != '\\' {
+											ok = false
+											break
+									}
+									lineIndex++
+							}
+					} else if pattern[i] == ' ' {
+							if line[lineIndex] != ' ' {
+									ok = false
+									break
+							}
+							lineIndex++
+					} else {
+							if line[lineIndex] != pattern[i] {
+									ok = false
+									break
+							}
+							lineIndex++
+					}
 			}
-			lineIndex++
-		}
-		if ok {
-			fmt.Println("Your word ", string(line), "contains the pattern", pattern)
-			return true, nil
-		}
-	}
+			
+			if ok {
+				fmt.Println("Your word ", string(line), "contains the pattern", pattern)
+				return true, nil
+			}
+}
+
 	fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)		
 	return false, nil
 }
