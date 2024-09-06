@@ -63,7 +63,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 		positiveChars := strings.TrimSuffix(strings.TrimPrefix(pattern, "["), "]")
 		
 		ok = bytes.ContainsAny(line, positiveChars)
-		if strings.HasPrefix(positiveChars, "^0") {
+		if strings.HasPrefix(positiveChars, "^") {
 			ok = !ok
 		}
 		
