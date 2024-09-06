@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 // bytes: Provides functions for byte slice manipulation, like checking for character presence.
@@ -49,9 +50,16 @@ func main() {
 // mastermind function
 func matchLine(line []byte, pattern string) (bool, error) {
 	hasCircumflex := pattern[0] == '^'
+	hasDollar := strings.HasSuffix(pattern,"$")
 	i := 0
-	if (hasCircumflex) {
+	if (hasCircumflex || hasDollar) {
 		i = 1
+	}
+	if hasDollar {
+		// line = line[:len(line)-1]
+		line = []byte(ReverseString(string(line)))
+		pattern = ReverseString(pattern)
+		fmt.Println("lines and patterns", line, pattern)
 	}
 	for startIndex := 0; startIndex < len(line); startIndex++ {
 			ok := true
@@ -125,7 +133,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 					}
 			}
 			
-			if !ok && hasCircumflex {
+			if !ok && (hasCircumflex || hasDollar) {
 				break 
 			}
 
@@ -137,5 +145,14 @@ func matchLine(line []byte, pattern string) (bool, error) {
 
 	fmt.Println("Your word ", string(line), " doesn't contains the pattern", pattern)		
 	return false, nil
+}
+
+func ReverseString(s string) string {
+	runes := []rune(s)
+	size := len(runes)
+	for i, j := 0, size-1; i < size>>1; i, j = i+1, j-1 {
+			runes[i], runes[j] = runes[j], runes[i]
+	}
+	return string(runes)
 }
 
