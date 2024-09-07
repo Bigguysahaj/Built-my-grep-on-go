@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"os"
-	"strings"
 )
 
 // bytes: Provides functions for byte slice manipulation, like checking for character presence.
@@ -13,9 +11,6 @@ import (
 // io: Contains functions for reading and writing data, similar to file handling.
 // os: Provides OS-level functionality, including command-line argument handling.
 // unicode/utf8: Helps with working with UTF-8 encoded strings, ensuring that characters are handled correctly.
-
-// Ensures gofmt doesn't remove the "bytes" import above (feel free to remove this!)
-var _ = bytes.ContainsAny
 
 // Usage: echo <input_text> | your_program.sh -E <pattern>
 
@@ -29,7 +24,6 @@ func main() {
 	pattern := os.Args[2]
 
 	line, err := io.ReadAll(os.Stdin) // assume we're only dealing with a single line
-	// hit: interesting, a destruct very simillar to python and js, very concise execution of err
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: read input text: %v\n", err)
 		os.Exit(2)
@@ -47,91 +41,33 @@ func main() {
 
 }
 
+
 func matchLine(line []byte, pattern string) (bool, error) {
-	parenExpressions := []string{""}
-	lineIndex := 0
-	patternIndex := 0
+	state := NewMatchState(line, pattern)
 
-	fmt.Printf("Starting matchLine with line: %s and pattern: %s\n", string(line), pattern)
+	if state.hasDollar {
+		state.line = []byte(ReverseString(string(state.line)))
+		state.pattern = ReverseString(state.pattern)
+		fmt.Println("lines and patterns", state.line, state.pattern)
+	}
 
-	for patternIndex < len(pattern) {
-		fmt.Printf("Current state: lineIndex=%d, patternIndex=%d\n", lineIndex, patternIndex)
-
-		if lineIndex >= len(line) && patternIndex < len(pattern) {
-			fmt.Println("Reached end of line before end of pattern")
-			return false, nil
+	for startIndex := 0; startIndex < len(state.line); startIndex++ {
+		if state.lineIndex >= len(state.line) {
+			fmt.Println("segmentation fault outer loop")
+			break
 		}
-
-		if pattern[patternIndex] == '(' {
-			closeParen := strings.IndexByte(pattern[patternIndex:], ')')
-			if closeParen == -1 {
-				fmt.Println("Error: unclosed parenthesis")
-				return false, fmt.Errorf("unclosed parenthesis")
-			}
-			expression := pattern[patternIndex+1 : patternIndex+closeParen]
-			fmt.Printf("Found capture group: %s\n", expression)
-			if strings.HasPrefix(string(line[lineIndex:]), expression) {
-				parenExpressions = append(parenExpressions, expression)
-				fmt.Printf("Matched capture group. parenExpressions: %v\n", parenExpressions)
-				lineIndex += len(expression)
-				patternIndex += closeParen + 1
-			} else {
-				fmt.Printf("Failed to match capture group: %s\n", expression)
-				return false, nil
-			}
-		} else if pattern[patternIndex] == '\\' && patternIndex+1 < len(pattern) {
-			if pattern[patternIndex+1] >= '1' && pattern[patternIndex+1] <= '9' {
-				groupNum := int(pattern[patternIndex+1] - '0')
-				fmt.Printf("Found backreference: \\%d\n", groupNum)
-				if groupNum < len(parenExpressions) {
-					expression := parenExpressions[groupNum]
-					fmt.Printf("Attempting to match backreference: %s\n", expression)
-					if strings.HasPrefix(string(line[lineIndex:]), expression) {
-						fmt.Println("Backreference matched successfully")
-						lineIndex += len(expression)
-						patternIndex += 2
-					} else {
-						fmt.Println("Failed to match backreference")
-						return false, nil
-					}
-				} else {
-					fmt.Printf("Error: invalid backreference \\%d\n", groupNum)
-					return false, fmt.Errorf("invalid backreference")
-				}
-			} else if pattern[patternIndex+1] == 'w' {
-				fmt.Printf("Matching \\w with character: %c\n", line[lineIndex])
-				if !bytes.ContainsAny([]byte{line[lineIndex]}, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_") {
-					fmt.Println("Failed to match \\w")
-					return false, nil
-				}
-				patternIndex += 2
-				lineIndex++
-			} else if pattern[patternIndex+1] == 'd' {
-				fmt.Printf("Matching \\d with character: %c\n", line[lineIndex])
-				if !bytes.ContainsAny([]byte{line[lineIndex]}, "0123456789") {
-					fmt.Println("Failed to match \\d")
-					return false, nil
-				}
-				patternIndex += 2
-				lineIndex++
-			} else {
-				fmt.Printf("Unhandled escape sequence: \\%c\n", pattern[patternIndex+1])
-				patternIndex += 2
-				lineIndex++
-			}
-		} else if pattern[patternIndex] == line[lineIndex] {
-			fmt.Printf("Matched character: %c\n", pattern[patternIndex])
-			patternIndex++
-			lineIndex++
-		} else {
-			fmt.Printf("Failed to match character: expected %c, got %c\n", pattern[patternIndex], line[lineIndex])
-			return false, nil
+		ok := matchFromIndex(state, startIndex)
+		if ok {
+			fmt.Println("Your word ", string(state.line), "contains the pattern", state.pattern)
+			return true, nil
+		}
+		if !ok && (state.hasCircumflex || state.hasDollar || state.hasPlus) {
+			break
 		}
 	}
 
-	matchResult := lineIndex == len(line)
-	fmt.Printf("Finished matching. Result: %v\n", matchResult)
-	return matchResult, nil
+	fmt.Println("Your word ", string(state.line), " doesn't contains the pattern", state.pattern)
+	return false, nil
 }
 
 // mastermind function
@@ -154,7 +90,6 @@ func matchLine(line []byte, pattern string) (bool, error) {
 // 	for startIndex := 0; startIndex < len(line); startIndex++ {
 // 		if lineIndex >= len(line) {
 // 			fmt.Println("segmentation fault outer loop")
-			
 // 			break
 // 		}
 // 		ok := true
