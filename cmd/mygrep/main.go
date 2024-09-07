@@ -49,6 +49,7 @@ func main() {
 
 // mastermind function
 func matchLine(line []byte, pattern string) (bool, error) {
+	parenExpressions := []string{"filler"}
 	hasCircumflex := pattern[0] == '^'
 	hasPlus := false
 	lineIndex := 0 
@@ -76,7 +77,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 			for ; i < len(pattern); i++ {
 					if lineIndex >= len(line) {
 						fmt.Println("segmentation fault inner loop")
-						ok = false
+						ok = (i == len(pattern)-1)
 						break
 					}
 					
@@ -97,13 +98,26 @@ func matchLine(line []byte, pattern string) (bool, error) {
 									}
 									i++
 									lineIndex++
-							} else {
-									if line[lineIndex] != '\\' {
-
-										ok = false
+							} else if pattern[i+1] >= '1' && pattern[i+1] <= '9' {
+								currExpression := parenExpressions[int(pattern[i+1] - '0')]
+								for lineIndex < len(line) {
+									fmt.Println("we have in repeat", string(line[lineIndex:]), currExpression)
+									if strings.HasSuffix(string(line[lineIndex:]) , currExpression) {
+										ok = true
+										lineIndex += len(currExpression)
 										break
+									} else {
+										ok = false
+										lineIndex++
 									}
-									lineIndex++
+								}
+							} else {
+								if line[lineIndex] != '\\' {
+
+									ok = false
+									break
+								}
+								lineIndex++
 							}
 					} else if pattern[i] == ' ' {
 							if line[lineIndex] != ' ' {
@@ -132,33 +146,45 @@ func matchLine(line []byte, pattern string) (bool, error) {
 						}
 						i += closeBracket
 					} else if pattern[i] == '(' {
-						// fmt.Println("finding paren", pattern[i:])
 						closeParen := bytes.IndexByte([]byte(pattern[i:]), ')')
 						
-						if closeParen == -1 {
-								return false, fmt.Errorf("unclosed parentheses")
-						}
-
 						expression := pattern[i+1 : i+closeParen]
 						alternatives := strings.Split(expression, "|")  
-            alternationMatch := false
-
-						for _, alt := range alternatives {
-							if strings.HasPrefix(string(line[lineIndex:]), alt) {
-								alternationMatch = true
-								lineIndex = len(alt)
+						if len(alternatives) > 1 {
+							alternationMatch := false
+							
+							for _, alt := range alternatives {
+								if strings.HasPrefix(string(line[lineIndex:]), alt) {
+									alternationMatch = true
+									lineIndex = len(alt)
+									break
+								}
+							}
+							
+							if !alternationMatch {
+								fmt.Println("got faltered at alternation")
+								ok = false
 								break
 							}
+							
+							i += closeParen
+						} else {
+							// Handles cases of "(cat) and \1"
+							parenExpressions = append(parenExpressions, expression)
+							for lineIndex < len(line) {
+								fmt.Println("we have ", string(line[lineIndex:]), expression)
+								if strings.HasSuffix(string(line[lineIndex:]) , expression) {
+									ok = true
+									lineIndex += len(expression)
+									i+= len(expression) + 1
+									break
+								} else {
+									ok = false
+									lineIndex++
+								}
+							}
 						}
-
-						if !alternationMatch {
-							fmt.Println("got faltered at alternation")
-							ok = false
-							break
-						}
-						
-						i += closeParen
-
+							
 					} else if pattern[i] == '+' {
 						hasPlus = true
 						for (line[lineIndex] == pattern[i-1]){
