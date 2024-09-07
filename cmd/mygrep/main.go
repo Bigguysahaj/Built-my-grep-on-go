@@ -131,6 +131,34 @@ func matchLine(line []byte, pattern string) (bool, error) {
 							return false, nil
 						}
 						i += closeBracket
+					} else if pattern[i] == '(' {
+						// fmt.Println("finding paren", pattern[i:])
+						closeParen := bytes.IndexByte([]byte(pattern[i:]), ')')
+						
+						if closeParen == -1 {
+								return false, fmt.Errorf("unclosed parentheses")
+						}
+
+						expression := pattern[i+1 : i+closeParen]
+						alternatives := strings.Split(expression, "|")  
+            alternationMatch := false
+
+						for _, alt := range alternatives {
+							if strings.HasPrefix(string(line[lineIndex:]), alt) {
+								alternationMatch = true
+								lineIndex = len(alt)
+								break
+							}
+						}
+
+						if !alternationMatch {
+							fmt.Println("got faltered at alternation")
+							ok = false
+							break
+						}
+						
+						i += closeParen
+
 					} else if pattern[i] == '+' {
 						hasPlus = true
 						for (line[lineIndex] == pattern[i-1]){
