@@ -2,7 +2,7 @@ package main
 
 import "strings"
 
-type matchState struct {
+type MatchState struct {
 	line             []byte
 	pattern          string
 	lineIndex        int
@@ -13,8 +13,8 @@ type matchState struct {
 	hasPlus          bool
 }
 
-func NewMatchState(line []byte, pattern string) *matchState {
-	return &matchState{
+func NewMatchState(line []byte, pattern string) *MatchState {
+	return &MatchState{
 		line:             line,
 		pattern:          pattern,
 		parenExpressions: []string{"filler"},

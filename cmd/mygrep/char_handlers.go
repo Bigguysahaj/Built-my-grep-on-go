@@ -2,12 +2,12 @@ package main
 
 import "fmt"
 
-func matchCharacter(state *matchState) bool {
+func MatchCharacter(state *MatchState) bool {
 	switch state.pattern[state.patternIndex] {
 	case '\\':
-		return handleBackslash(state)
+		return HandleBackslash(state)
 	case ' ':
-		return handleSpace(state)
+		return HandleSpace(state)
 	case '[':
 		return handleCharacterClass(state)
 	case '(':
@@ -19,11 +19,11 @@ func matchCharacter(state *matchState) bool {
 		state.lineIndex++
 		return true
 	default:
-		return handleDefault(state)
+		return HandleDefault(state)
 	}
 }
 
-func handleSpace(state *matchState) bool {
+func HandleSpace(state *MatchState) bool {
 	if state.line[state.lineIndex] != ' ' {
 		fmt.Println("Error on space")
 		return false
@@ -32,7 +32,7 @@ func handleSpace(state *matchState) bool {
 	return true
 }
 
-func handleDefault(state *matchState) bool {
+func HandleDefault(state *MatchState) bool {
 	fmt.Printf("Let's see all %c, %c \n", state.line[state.lineIndex], state.pattern[state.patternIndex])
 	if state.line[state.lineIndex] != state.pattern[state.patternIndex] {
 		if state.pattern[state.patternIndex] == '?' {

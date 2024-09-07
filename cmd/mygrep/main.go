@@ -56,7 +56,7 @@ func matchLine(line []byte, pattern string) (bool, error) {
 			fmt.Println("segmentation fault outer loop")
 			break
 		}
-		ok := matchFromIndex(state, startIndex)
+		ok := MatchFromIndex(state, startIndex)
 		if ok {
 			fmt.Println("Your word ", string(state.line), "contains the pattern", state.pattern)
 			return true, nil

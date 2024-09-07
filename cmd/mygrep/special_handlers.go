@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func handleBackslash(state *matchState) bool {
+func HandleBackslash(state *MatchState) bool {
 	if state.patternIndex+1 >= len(state.pattern) {
 		return false
 	}
@@ -33,7 +33,7 @@ func handleBackslash(state *matchState) bool {
 	return true
 }
 
-func handleBackReference(state *matchState) bool {
+func handleBackReference(state *MatchState) bool {
 	currExpression := state.parenExpressions[int(state.pattern[state.patternIndex+1]-'0')]
 	for state.lineIndex < len(state.line) {
 		fmt.Println("we have in repeat", string(state.line[state.lineIndex:]), currExpression)
@@ -46,7 +46,7 @@ func handleBackReference(state *matchState) bool {
 	return false
 }
 
-func handleCharacterClass(state *matchState) bool {
+func handleCharacterClass(state *MatchState) bool {
 	closeBracket := bytes.IndexByte([]byte(state.pattern[state.patternIndex:]), ']')
 	if closeBracket == -1 {
 		return false
@@ -65,7 +65,7 @@ func handleCharacterClass(state *matchState) bool {
 	return true
 }
 
-func handleParentheses(state *matchState) bool {
+func handleParentheses(state *MatchState) bool {
 	closeParen := bytes.IndexByte([]byte(state.pattern[state.patternIndex:]), ')')
 	expression := state.pattern[state.patternIndex+1 : state.patternIndex+closeParen]
 	alternatives := strings.Split(expression, "|")
@@ -75,7 +75,7 @@ func handleParentheses(state *matchState) bool {
 	return handleSimpleParentheses(state, expression)
 }
 
-func handleAlternation(state *matchState, alternatives []string) bool {
+func handleAlternation(state *MatchState, alternatives []string) bool {
 	for _, alt := range alternatives {
 		if strings.HasPrefix(string(state.line[state.lineIndex:]), alt) {
 			state.lineIndex += len(alt)
@@ -87,7 +87,7 @@ func handleAlternation(state *matchState, alternatives []string) bool {
 	return false
 }
 
-func handleSimpleParentheses(state *matchState, expression string) bool {
+func handleSimpleParentheses(state *MatchState, expression string) bool {
 	state.parenExpressions = append(state.parenExpressions, expression)
 	for state.lineIndex < len(state.line) {
 		fmt.Println("we have ", string(state.line[state.lineIndex:]), expression)
@@ -101,7 +101,7 @@ func handleSimpleParentheses(state *matchState, expression string) bool {
 	return false
 }
 
-func handlePlus(state *matchState) bool {
+func handlePlus(state *MatchState) bool {
 	state.hasPlus = true
 	for state.line[state.lineIndex] == state.pattern[state.patternIndex-1] {
 		state.lineIndex++
